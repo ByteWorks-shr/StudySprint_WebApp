@@ -1,0 +1,182 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny-all catch-all safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Material validation
+    function isValidMaterial(data) {
+      return data.userId is string && data.userId == request.auth.uid
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.subject is string && data.subject.size() > 0 && data.subject.size() <= 100
+        && data.topic is string && data.topic.size() <= 150
+        && data.content is string && data.content.size() <= 50000;
+    }
+
+    // PDF Doc validation
+    function isValidPdf(data) {
+      return data.userId is string && data.userId == request.auth.uid
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.fileName is string && data.fileName.size() <= 200
+        && data.subject is string && data.subject.size() <= 100
+        && data.extractedText is string && data.extractedText.size() <= 200000;
+    }
+
+    // Task validation
+    function isValidTask(data) {
+      return data.userId is string && data.userId == request.auth.uid
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.subject is string && data.subject.size() <= 100
+        && (data.priority == 'low' || data.priority == 'medium' || data.priority == 'high')
+        && (data.status == 'pending' || data.status == 'in_progress' || data.status == 'completed');
+    }
+
+    // Study Plan validation
+    function isValidPlan(data) {
+      return data.userId is string && data.userId == request.auth.uid
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.examDate is string && data.examDate.size() <= 50
+        && (data.status == 'active' || data.status == 'archived');
+    }
+
+    // Study Session validation
+    function isValidSession(data) {
+      return data.userId is string && data.userId == request.auth.uid
+        && data.subject is string && data.subject.size() <= 100
+        && data.durationMinutes is number && data.durationMinutes >= 0 && data.durationMinutes <= 1440
+        && data.sessionDate is string && data.sessionDate.size() <= 30;
+    }
+
+    // User Stat validation
+    function isValidUserStat(data) {
+      return data.userId is string && data.userId == request.auth.uid
+        && data.currentStreak is number && data.currentStreak >= 0
+        && data.totalStudyMinutes is number && data.totalStudyMinutes >= 0;
+    }
+
+    // Chat Message validation
+    function isValidChatMessage(data) {
+      return data.userId is string && data.userId == request.auth.uid
+        && (data.role == 'user' || data.role == 'model')
+        && data.text is string && data.text.size() <= 30000;
+    }
+
+    // Syllabus Document validation
+    function isValidSyllabus(data) {
+      return data.userId is string && data.userId == request.auth.uid
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.fileName is string && data.fileName.size() <= 200
+        && data.extractedText is string && data.extractedText.size() <= 300000;
+    }
+
+    // Curriculum Progress validation
+    function isValidCurriculumProgress(data) {
+      return data.userId is string && data.userId == request.auth.uid
+        && data.syllabusId is string && data.syllabusId.size() > 0 && data.syllabusId.size() <= 128;
+    }
+
+    // Materials Collection
+    match /materials/{materialId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isValidId(materialId) && isOwner(incoming().userId) && isValidMaterial(incoming());
+      allow update: if isValidId(materialId) && isOwner(existing().userId) && incoming().userId == existing().userId && isValidMaterial(incoming());
+      allow delete: if isValidId(materialId) && isOwner(existing().userId);
+    }
+
+    // PDFs Collection
+    match /pdfs/{pdfId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isValidId(pdfId) && isOwner(incoming().userId) && isValidPdf(incoming());
+      allow update: if isValidId(pdfId) && isOwner(existing().userId) && incoming().userId == existing().userId && isValidPdf(incoming());
+      allow delete: if isValidId(pdfId) && isOwner(existing().userId);
+    }
+
+    // Tasks Collection
+    match /tasks/{taskId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isValidId(taskId) && isOwner(incoming().userId) && isValidTask(incoming());
+      allow update: if isValidId(taskId) && isOwner(existing().userId) && incoming().userId == existing().userId && isValidTask(incoming());
+      allow delete: if isValidId(taskId) && isOwner(existing().userId);
+    }
+
+    // Study Plans Collection
+    match /studyPlans/{planId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isValidId(planId) && isOwner(incoming().userId) && isValidPlan(incoming());
+      allow update: if isValidId(planId) && isOwner(existing().userId) && incoming().userId == existing().userId && isValidPlan(incoming());
+      allow delete: if isValidId(planId) && isOwner(existing().userId);
+    }
+
+    // Study Sessions Collection
+    match /studySessions/{sessionId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isValidId(sessionId) && isOwner(incoming().userId) && isValidSession(incoming());
+      allow update: if isValidId(sessionId) && isOwner(existing().userId) && incoming().userId == existing().userId && isValidSession(incoming());
+      allow delete: if isValidId(sessionId) && isOwner(existing().userId);
+    }
+
+    // User Stats Collection
+    match /userStats/{statId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isValidId(statId) && isOwner(incoming().userId) && isValidUserStat(incoming());
+      allow update: if isValidId(statId) && isOwner(existing().userId) && incoming().userId == existing().userId && isValidUserStat(incoming());
+      allow delete: if isValidId(statId) && isOwner(existing().userId);
+    }
+
+    // Chat Messages Collection
+    match /chatMessages/{messageId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isValidId(messageId) && isOwner(incoming().userId) && isValidChatMessage(incoming());
+      allow update: if isValidId(messageId) && isOwner(existing().userId) && incoming().userId == existing().userId && isValidChatMessage(incoming());
+      allow delete: if isValidId(messageId) && isOwner(existing().userId);
+    }
+
+    // Syllabi Collection
+    match /syllabi/{syllabusId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isValidId(syllabusId) && isOwner(incoming().userId) && isValidSyllabus(incoming());
+      allow update: if isValidId(syllabusId) && isOwner(existing().userId) && incoming().userId == existing().userId && isValidSyllabus(incoming());
+      allow delete: if isValidId(syllabusId) && isOwner(existing().userId);
+    }
+
+    // Curriculum Progress Collection
+    match /curriculumProgress/{progressId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isValidId(progressId) && isOwner(incoming().userId) && isValidCurriculumProgress(incoming());
+      allow update: if isValidId(progressId) && isOwner(existing().userId) && incoming().userId == existing().userId && isValidCurriculumProgress(incoming());
+      allow delete: if isValidId(progressId) && isOwner(existing().userId);
+    }
+  }
+}

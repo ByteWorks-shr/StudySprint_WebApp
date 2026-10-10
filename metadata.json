@@ -1,0 +1,6 @@
+{
+  "name": "OmniStudy - Smart Study Planner & Materials Hub",
+  "description": "All-in-one student dashboard for organizing study materials, PDF library with content extraction, personalized smart study schedules, pomodoro focus sessions, task tracking, and study streak analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

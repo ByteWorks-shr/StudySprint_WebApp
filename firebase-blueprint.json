@@ -1,0 +1,205 @@
+{
+  "entities": {
+    "material": {
+      "title": "StudyMaterial",
+      "description": "Student notes, topics, and organized study material",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "subject": { "type": "string", "maxLength": 100 },
+        "topic": { "type": "string", "maxLength": 150 },
+        "content": { "type": "string", "maxLength": 50000 },
+        "tags": { "type": "array" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "title", "subject", "topic", "content", "createdAt", "updatedAt"]
+    },
+    "pdfDoc": {
+      "title": "PdfDocument",
+      "description": "Uploaded study PDF metadata and extracted searchable text content",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "fileName": { "type": "string", "maxLength": 200 },
+        "fileSize": { "type": "number" },
+        "pageCount": { "type": "number" },
+        "extractedText": { "type": "string", "maxLength": 200000 },
+        "topics": { "type": "array" },
+        "subject": { "type": "string", "maxLength": 100 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "title", "fileName", "subject", "createdAt", "updatedAt"]
+    },
+    "task": {
+      "title": "StudyTask",
+      "description": "Individual study task with status, priority, and due dates",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "subject": { "type": "string", "maxLength": 100 },
+        "topic": { "type": "string", "maxLength": 150 },
+        "dueDate": { "type": "string", "maxLength": 50 },
+        "priority": { "type": "string", "enum": ["low", "medium", "high"] },
+        "status": { "type": "string", "enum": ["pending", "in_progress", "completed"] },
+        "estimatedMinutes": { "type": "number" },
+        "completedAt": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "title", "subject", "priority", "status", "createdAt", "updatedAt"]
+    },
+    "studyPlan": {
+      "title": "StudyPlan",
+      "description": "Smart personalized study plan generated based on exam date and topics",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "examDate": { "type": "string", "maxLength": 50 },
+        "dailyStudyHours": { "type": "number" },
+        "subjects": { "type": "array" },
+        "schedule": { "type": "array" },
+        "status": { "type": "string", "enum": ["active", "archived"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "title", "examDate", "status", "createdAt", "updatedAt"]
+    },
+    "session": {
+      "title": "StudySession",
+      "description": "Recorded pomodoro/focused study sessions for streak and progress tracking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "subject": { "type": "string", "maxLength": 100 },
+        "topic": { "type": "string", "maxLength": 150 },
+        "durationMinutes": { "type": "number" },
+        "sessionDate": { "type": "string", "maxLength": 20 },
+        "completedAt": { "type": "string", "maxLength": 50 },
+        "notes": { "type": "string", "maxLength": 5000 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "subject", "durationMinutes", "sessionDate", "createdAt"]
+    },
+    "userStat": {
+      "title": "UserStats",
+      "description": "Aggregated user stats including study streaks and total time",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "currentStreak": { "type": "number" },
+        "longestStreak": { "type": "number" },
+        "lastStudyDate": { "type": "string", "maxLength": 20 },
+        "totalStudyMinutes": { "type": "number" },
+        "completedTasksCount": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "currentStreak", "totalStudyMinutes", "updatedAt"]
+    },
+    "chatMessage": {
+      "title": "ChatMessage",
+      "description": "Multi-turn Gemini chat interaction history",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["user", "model"] },
+        "text": { "type": "string", "maxLength": 30000 },
+        "persona": { "type": "string", "maxLength": 50 },
+        "modelUsed": { "type": "string", "maxLength": 60 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "role", "text", "createdAt"]
+    },
+    "syllabusDoc": {
+      "title": "SyllabusDocument",
+      "description": "Student uploaded syllabus documents with structured AI curriculum analysis",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "fileName": { "type": "string", "maxLength": 200 },
+        "fileSize": { "type": "number" },
+        "pageCount": { "type": "number" },
+        "university": { "type": "string", "maxLength": 150 },
+        "course": { "type": "string", "maxLength": 150 },
+        "branch": { "type": "string", "maxLength": 150 },
+        "semester": { "type": "string", "maxLength": 100 },
+        "academicYear": { "type": "string", "maxLength": 100 },
+        "extractedText": { "type": "string", "maxLength": 250000 },
+        "analysis": { "type": "object" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "title", "fileName", "createdAt", "updatedAt"]
+    },
+    "curriculumProgress": {
+      "title": "StudentCurriculumProgress",
+      "description": "Student progress tracking for syllabus topics, practicals, and term work",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "syllabusId": { "type": "string", "maxLength": 128 },
+        "completedTopicIds": { "type": "array" },
+        "inProgressTopicIds": { "type": "array" },
+        "completedPracticalIds": { "type": "array" },
+        "recordSubmittedPracticalIds": { "type": "array" },
+        "completedTermWorkIds": { "type": "array" },
+        "customTermWorkDeadlines": { "type": "object" },
+        "microProjectStagesCompleted": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "syllabusId", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/materials/{materialId}": {
+      "schema": "material",
+      "description": "User notes and study materials"
+    },
+    "/pdfs/{pdfId}": {
+      "schema": "pdfDoc",
+      "description": "Uploaded PDFs with extracted search content"
+    },
+    "/tasks/{taskId}": {
+      "schema": "task",
+      "description": "Student study tasks"
+    },
+    "/studyPlans/{planId}": {
+      "schema": "studyPlan",
+      "description": "Student customized study schedules"
+    },
+    "/studySessions/{sessionId}": {
+      "schema": "session",
+      "description": "Logged focused study sessions"
+    },
+    "/userStats/{statId}": {
+      "schema": "userStat",
+      "description": "Student study streaks and overall stats"
+    },
+    "/chatMessages/{messageId}": {
+      "schema": "chatMessage",
+      "description": "Gemini chatbot conversation history"
+    },
+    "/syllabi/{syllabusId}": {
+      "schema": "syllabusDoc",
+      "description": "Student uploaded syllabus documents with structured AI curriculum analysis"
+    },
+    "/curriculumProgress/{progressId}": {
+      "schema": "curriculumProgress",
+      "description": "Student progress tracking for syllabus topics, practicals, and term work"
+    }
+  }
+}

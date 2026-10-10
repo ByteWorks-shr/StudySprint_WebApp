@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudySprint - Spring Boot & Vanilla JS Edition</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo">
+        <span class="logo-icon">🧠</span>
+        <span class="logo-text">StudySprint <span class="badge">Spring Boot</span></span>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="nav-btn" data-tab="notes">Study Notes</button>
+        <button class="nav-btn" data-tab="tasks">Tasks</button>
+        <button class="nav-btn" data-tab="timer">Focus Timer</button>
+        <button class="nav-btn" data-tab="ai-tutor">AI Tutor (Gemini)</button>
+      </nav>
+
+      <div class="header-actions">
+        <div class="streak-badge">🔥 <span id="streak-count">5</span>d Streak</div>
+        <div class="search-box-bar" style="display:flex;align-items:center;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:0.25rem 0.5rem;gap:0.35rem;">
+          <button id="search-back-btn" class="icon-btn" title="Back" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;">←</button>
+          <input id="header-search-in" type="text" placeholder="Search..." style="background:transparent;border:none;color:white;font-size:0.8rem;outline:none;width:90px;" />
+          <button id="dictate-btn" class="icon-btn" title="Mic Dictation" style="background:transparent;border:none;color:#818cf8;cursor:pointer;">🎙️</button>
+          <button id="search-clear-btn" class="icon-btn" title="Clear Search" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;">✖</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <!-- DASHBOARD VIEW -->
+    <section id="view-dashboard" class="view-panel active">
+      <div class="hero-card">
+        <h2>Welcome to StudySprint - SBTE Bihar 5th Sem CSE</h2>
+        <p>Comprehensive study hub for Java Programming, Software Engineering, Networks, and Python. Powered by Spring Boot and Gemini AI.</p>
+        <div class="hero-buttons">
+          <button class="btn btn-primary" onclick="switchTab('timer')">▶️ Start Pomodoro</button>
+          <button class="btn btn-secondary" onclick="switchTab('ai-tutor')">✨ Ask Gemini AI</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-title">STUDY STREAK</span>
+          <div class="kpi-value" id="kpi-streak">5 Days</div>
+          <span class="kpi-sub">Consistent Daily Study</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">TASKS COMPLETED</span>
+          <div class="kpi-value" id="kpi-tasks">0 / 0</div>
+          <span class="kpi-sub">Spring Boot REST API</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">STUDY MATERIALS</span>
+          <div class="kpi-value" id="kpi-notes">0 Notes</div>
+          <span class="kpi-sub">H2 Database Stored</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- STUDY NOTES VIEW -->
+    <section id="view-notes" class="view-panel">
+      <div class="view-header">
+        <h2>Study Materials & Notes</h2>
+        <button class="btn btn-primary" id="open-note-modal">+ New Note</button>
+      </div>
+      <div id="notes-list" class="cards-grid">
+        <!-- Rendered via JavaScript -->
+      </div>
+    </section>
+
+    <!-- TASKS VIEW -->
+    <section id="view-tasks" class="view-panel">
+      <div class="view-header">
+        <h2>Study Tasks & Assignments</h2>
+        <button class="btn btn-primary" id="open-task-modal">+ Add Task</button>
+      </div>
+      <div id="tasks-list" class="tasks-container">
+        <!-- Rendered via JavaScript -->
+      </div>
+    </section>
+
+    <!-- FOCUS TIMER VIEW -->
+    <section id="view-timer" class="view-panel">
+      <div class="timer-card">
+        <h2>Pomodoro Focus Timer</h2>
+        <div class="timer-display" id="timer-clock">25:00</div>
+        <div class="timer-controls">
+          <button id="timer-start-btn" class="btn btn-primary">Start</button>
+          <button id="timer-reset-btn" class="btn btn-secondary">Reset</button>
+        </div>
+        <div class="timer-presets">
+          <button class="btn-preset active" data-time="25">25m Focus</button>
+          <button class="btn-preset" data-time="50">50m Deep Work</button>
+          <button class="btn-preset" data-time="5">5m Break</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GEMINI AI TUTOR VIEW -->
+    <section id="view-ai-tutor" class="view-panel">
+      <div class="chat-container">
+        <div class="chat-header">
+          <h3>✨ Gemini Multi-Turn Academic Tutor</h3>
+          <span class="chat-model-tag">gemini-3.5-flash</span>
+        </div>
+        <div id="chat-thread" class="chat-thread">
+          <div class="chat-msg model">
+            Hello! I am your OmniStudy AI academic mentor. What subject or concept would you like to explore today?
+          </div>
+        </div>
+        <form id="chat-form" class="chat-form">
+          <input type="text" id="chat-input" placeholder="Ask any question, request practice quiz, or get derivations..." required />
+          <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODALS -->
+  <div id="modal-container" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h3 id="modal-title">Create Item</h3>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
